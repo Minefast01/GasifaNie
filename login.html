@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>เข้าสู่ระบบ</title>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<style>
+  body { font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; padding: 20px; background: #f0f0f0; }
+  .container { max-width: 400px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 0 12px rgba(0,0,0,0.1); }
+  input, button { width: 100%; padding: 10px; margin: 8px 0; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; }
+  button { background: #0078d4; color: white; border: none; cursor: pointer; }
+  button:hover { background: #005a9e; }
+  #status { margin-top: 12px; color: red; min-height: 24px; }
+</style>
+</head>
+<body>
+  <div class="container">
+    <h2>สมัครสมาชิก</h2>
+    <input type="email" id="signup-email" placeholder="อีเมล" />
+    <input type="password" id="signup-password" placeholder="รหัสผ่าน" />
+    <button id="signup-btn">สมัครสมาชิก</button>
+
+    <h2>เข้าสู่ระบบ</h2>
+    <input type="email" id="login-email" placeholder="อีเมล" />
+    <input type="password" id="login-password" placeholder="รหัสผ่าน" />
+    <button id="login-btn">เข้าสู่ระบบ</button>
+
+    <div id="status"></div>
+  </div>
+
+<script>
+  // กรอกค่าจาก Firebase Console ของคุณ
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    // ... ใส่ค่าที่เหลือจาก Firebase Console
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+
+  const status = document.getElementById('status');
+
+  document.getElementById('signup-btn').addEventListener('click', () => {
+    const email = document.getElementById('signup-email').value;
+    const password = document.getElementById('signup-password').value;
+    status.textContent = '';
+    auth.createUserWithEmailAndPassword(email, password)
+      .then(() => {
+        status.style.color = 'green';
+        status.textContent = 'สมัครสมาชิกสำเร็จ! กรุณาเข้าสู่ระบบ';
+      })
+      .catch(error => {
+        status.style.color = 'red';
+        status.textContent = 'ข้อผิดพลาด: ' + error.message;
+      });
+  });
+
+  document.getElementById('login-btn').addEventListener('click', () => {
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+    status.textContent = '';
+    auth.signInWithEmailAndPassword(email, password)
+      .then(() => {
+        status.style.color = 'green';
+        status.textContent = 'เข้าสู่ระบบสำเร็จ กำลังไปยังหน้าเว็บหลัก...';
+        setTimeout(() => {
+          window.location.href = 'index.html';
+        }, 1000);
+      })
+      .catch(error => {
+        status.style.color = 'red';
+        status.textContent = 'ข้อผิดพลาด: ' + error.message;
+      });
+  });
+
+  // ถ้าผู้ใช้ล็อกอินอยู่แล้ว ให้ไปหน้า index.html เลย
+  auth.onAuthStateChanged(user => {
+    if(user){
+      window.location.href = 'index.html';
+    }
+  });
+</script>
+</body>
+</html>
