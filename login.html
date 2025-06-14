@@ -1,37 +1,176 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>เข้าสู่ระบบ</title>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<style>
-  body { font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; padding: 20px; background: #f0f0f0; }
-  .container { max-width: 400px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 0 12px rgba(0,0,0,0.1); }
-  input, button { width: 100%; padding: 10px; margin: 8px 0; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; }
-  button { background: #0078d4; color: white; border: none; cursor: pointer; }
-  button:hover { background: #005a9e; }
-  #status { margin-top: 12px; color: red; min-height: 24px; }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>เข้าสู่ระบบ</title>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <style>
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: #f7f7f7;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .container {
+      width: 100%;
+      max-width: 340px;
+      background: #fff;
+      padding: 28px 24px 20px 24px;
+      border-radius: 14px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      align-items: center;
+    }
+    .container h2 {
+      margin: 0 0 8px 0;
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #0078d4;
+      text-align: center;
+    }
+    form {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    input {
+      width: 100%;
+      max-width: 260px;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      padding: 10px 12px;
+      font-size: 15px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      margin-bottom: 10px;
+      background: #fafbfc;
+      transition: border-color 0.2s;
+      box-sizing: border-box;
+      text-align: left;
+    }
+    input:focus {
+      border-color: #0078d4;
+      outline: none;
+      background: #fff;
+    }
+    button {
+      width: 100%;
+      max-width: 260px;
+      padding: 10px 0;
+      font-size: 16px;
+      border-radius: 8px;
+      border: none;
+      background: #0078d4;
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 6px;
+      transition: background 0.2s;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    button:hover {
+      background: #005a9e;
+    }
+    #google-btn {
+      background: #fff;
+      color: #444;
+      border: 1px solid #ddd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-weight: 500;
+      margin-bottom: 10px;
+      margin-top: 2px;
+    }
+    #google-btn img {
+      width: 20px;
+      height: 20px;
+      display: inline-block;
+    }
+    #status {
+      min-height: 22px;
+      font-size: 14px;
+      text-align: center;
+      color: #dc3545;
+      margin-top: 2px;
+    }
+    .switch-link {
+      text-align: center;
+      font-size: 14px;
+      color: #555;
+      margin-top: 2px;
+      cursor: pointer;
+      text-decoration: underline;
+      background: none;
+      border: none;
+      padding: 0;
+      width: 100%;
+      max-width: 260px;
+      margin-left: auto;
+      margin-right: auto;
+      display: block;
+    }
+    .switch-link:hover {
+      color: #0078d4;
+    }
+    .hidden { display: none; }
+    .or-divider {
+      width: 100%;
+      max-width: 260px;
+      text-align: center;
+      color: #aaa;
+      font-size: 13px;
+      margin: 8px 0 4px 0;
+      position: relative;
+    }
+    .or-divider:before, .or-divider:after {
+      content: "";
+      display: inline-block;
+      width: 40%;
+      height: 1px;
+      background: #eee;
+      vertical-align: middle;
+      margin: 0 6px;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
-    <h2>สมัครสมาชิก</h2>
-    <input type="email" id="signup-email" placeholder="อีเมล" />
-    <input type="password" id="signup-password" placeholder="รหัสผ่าน" />
-    <button id="signup-btn">สมัครสมาชิก</button>
-
-    <h2>เข้าสู่ระบบ</h2>
-    <input type="email" id="login-email" placeholder="อีเมล" />
-    <input type="password" id="login-password" placeholder="รหัสผ่าน" />
-    <button id="login-btn">เข้าสู่ระบบ</button>
-
+    <h2 id="form-title">เข้าสู่ระบบ</h2>
+    <button type="button" id="google-btn">
+      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" />
+      เข้าสู่ระบบด้วย Google
+    </button>
+    <div class="or-divider">หรือ</div>
+    <form id="login-form">
+      <input type="email" id="login-email" placeholder="อีเมล" autocomplete="username" required />
+      <input type="password" id="login-password" placeholder="รหัสผ่าน" autocomplete="current-password" required />
+      <button type="submit" id="login-btn">เข้าสู่ระบบ</button>
+    </form>
+    <form id="signup-form" class="hidden">
+      <input type="email" id="signup-email" placeholder="อีเมล" autocomplete="username" required />
+      <input type="password" id="signup-password" placeholder="รหัสผ่าน (อย่างน้อย 6 ตัว)" autocomplete="new-password" required />
+      <button type="submit" id="signup-btn">สมัครสมาชิก</button>
+    </form>
+    <button class="switch-link" id="switch-to-signup">ยังไม่มีบัญชี? สมัครสมาชิก</button>
+    <button class="switch-link hidden" id="switch-to-login">มีบัญชีอยู่แล้ว? เข้าสู่ระบบ</button>
     <div id="status"></div>
   </div>
 
 <script>
-  // Firebase config (ใช้ Web API Key ที่ให้มา)
+  // Firebase config
   const firebaseConfig = {
     apiKey: "AIzaSyB0uJoVfeo8pgeTSBnpIS0_Wn0crK77tn8",
     authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
@@ -42,8 +181,32 @@
   const auth = firebase.auth();
 
   const status = document.getElementById('status');
+  const loginForm = document.getElementById('login-form');
+  const signupForm = document.getElementById('signup-form');
+  const switchToSignup = document.getElementById('switch-to-signup');
+  const switchToLogin = document.getElementById('switch-to-login');
+  const formTitle = document.getElementById('form-title');
+  const googleBtn = document.getElementById('google-btn');
 
-  document.getElementById('signup-btn').addEventListener('click', () => {
+  switchToSignup.onclick = () => {
+    loginForm.classList.add('hidden');
+    signupForm.classList.remove('hidden');
+    switchToSignup.classList.add('hidden');
+    switchToLogin.classList.remove('hidden');
+    formTitle.textContent = "สมัครสมาชิก";
+    status.textContent = "";
+  };
+  switchToLogin.onclick = () => {
+    signupForm.classList.add('hidden');
+    loginForm.classList.remove('hidden');
+    switchToLogin.classList.add('hidden');
+    switchToSignup.classList.remove('hidden');
+    formTitle.textContent = "เข้าสู่ระบบ";
+    status.textContent = "";
+  };
+
+  signupForm.addEventListener('submit', e => {
+    e.preventDefault();
     const email = document.getElementById('signup-email').value;
     const password = document.getElementById('signup-password').value;
     status.textContent = '';
@@ -51,14 +214,16 @@
       .then(() => {
         status.style.color = 'green';
         status.textContent = 'สมัครสมาชิกสำเร็จ! กรุณาเข้าสู่ระบบ';
+        setTimeout(() => switchToLogin.click(), 1000);
       })
       .catch(error => {
-        status.style.color = 'red';
+        status.style.color = '#dc3545';
         status.textContent = 'ข้อผิดพลาด: ' + error.message;
       });
   });
 
-  document.getElementById('login-btn').addEventListener('click', () => {
+  loginForm.addEventListener('submit', e => {
+    e.preventDefault();
     const email = document.getElementById('login-email').value;
     const password = document.getElementById('login-password').value;
     status.textContent = '';
@@ -68,10 +233,27 @@
         status.textContent = 'เข้าสู่ระบบสำเร็จ กำลังไปยังหน้าเว็บหลัก...';
         setTimeout(() => {
           window.location.href = 'index.html';
-        }, 1000);
+        }, 800);
       })
       .catch(error => {
-        status.style.color = 'red';
+        status.style.color = '#dc3545';
+        status.textContent = 'ข้อผิดพลาด: ' + error.message;
+      });
+  });
+
+  // Google Login
+  googleBtn.addEventListener('click', function() {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(provider)
+      .then(() => {
+        status.style.color = 'green';
+        status.textContent = 'เข้าสู่ระบบด้วย Google สำเร็จ กำลังไปยังหน้าเว็บหลัก...';
+        setTimeout(() => {
+          window.location.href = 'index.html';
+        }, 800);
+      })
+      .catch(error => {
+        status.style.color = '#dc3545';
         status.textContent = 'ข้อผิดพลาด: ' + error.message;
       });
   });
