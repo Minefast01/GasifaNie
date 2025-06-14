@@ -27,6 +27,8 @@
     background: #121212;
     color: #ddd;
   }
+
+  /* Sidebar Styles (Default for Desktop) */
   #sidebar {
     width: 260px;
     background: var(--sidebar-bg-light);
@@ -36,12 +38,13 @@
     padding: 20px;
     box-sizing: border-box;
     border-right: 1px solid var(--sidebar-border-light);
-    position: fixed;
+    position: fixed; /* Keep it fixed on desktop too */
     top: 0;
     left: 0;
     height: 100vh;
     overflow-y: auto;
-    transition: background 0.3s, color 0.3s, border-color 0.3s;
+    transition: background 0.3s, color 0.3s, border-color 0.3s, left 0.3s ease-in-out; /* Add left to transition */
+    z-index: 100; /* Ensure it's above main content on desktop */
   }
   body.dark-mode #sidebar {
     background: var(--sidebar-bg-dark);
@@ -131,9 +134,11 @@
   #new-category button:hover {
     background: #005a9e;
   }
+
+  /* Content Wrapper Styles */
   #content-wrapper {
-    margin-left: 260px;
-    width: calc(100vw - 260px);
+    margin-left: 260px; /* Shift content by sidebar width on desktop */
+    width: calc(100vw - 260px); /* Content takes remaining width */
     flex-grow: 1;
     display: flex;
     flex-direction: column;
@@ -142,7 +147,7 @@
     box-sizing: border-box;
     overflow-y: auto;
     background: transparent;
-    transition: background 0.3s, color 0.3s;
+    transition: background 0.3s, color 0.3s, margin-left 0.3s ease-in-out, width 0.3s ease-in-out;
   }
   #top-bar {
     display: flex;
@@ -164,6 +169,23 @@
   #toggle-theme-btn:hover {
     background: #005a9e;
   }
+
+  /* Hamburger Button (Mobile Only) */
+  #hamburger-btn {
+    display: none; /* Hidden by default on desktop */
+    background: #0078d4;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    border-radius: 8px;
+    margin-right: auto; /* Push theme button to the right */
+    z-index: 101; /* Above input tab if sidebar open */
+  }
+
+  /* Input Tab Styles */
   #input-tab {
     position: fixed;
     bottom: 20px;
@@ -180,7 +202,7 @@
     box-sizing: border-box;
     border: 2px solid transparent;
     font-size: 16px;
-    z-index: 1000;
+    z-index: 999; /* Below sidebar if open */
     transition: background-color 0.3s;
   }
   body.dark-mode #input-tab {
@@ -217,6 +239,8 @@
   #add-task-btn:hover {
     background-color: #005a9e;
   }
+
+  /* Task List & Item Styles */
   ul#task-list {
     list-style: none;
     padding: 0;
@@ -314,6 +338,8 @@
   ul#task-list li .view-btn:hover {
     background: #005a9e;
   }
+
+  /* Image Overlay (Full View) Styles */
   #image-overlay {
     display: none;
     position: fixed;
@@ -449,34 +475,78 @@
     height: 100%;
     object-fit: contain;
   }
-  /* Responsive สำหรับมือถือ */
+
+  /* Sidebar overlay (mobile only) */
+  #sidebar-overlay {
+    display: none; /* Hidden by default */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000; /* Below sidebar, above content */
+    transition: opacity 0.3s ease-in-out;
+  }
+  #sidebar-overlay.visible {
+    display: block;
+    opacity: 1;
+  }
+
+  /* Responsive for Mobile */
   @media (max-width: 600px) {
+    /* Sidebar adjustments for mobile */
+    #sidebar {
+      left: -260px; /* Hide sidebar off-screen */
+      z-index: 1001; /* Ensure it's above everything when open */
+    }
+    #sidebar.sidebar-open {
+      left: 0; /* Show sidebar */
+    }
+    #content-wrapper {
+      margin-left: 0; /* Content takes full width, no sidebar margin */
+      width: 100vw;
+    }
+    #top-bar {
+      justify-content: space-between; /* Hamburger to the left, theme button to the right */
+    }
+    #hamburger-btn {
+      display: block; /* Show hamburger button on mobile */
+    }
+
+    /* Image Overlay adjustments for mobile */
     #image-overlay > div {
-      flex-direction: column;
+      flex-direction: column; /* Stack image and text vertically */
       height: auto;
-      max-height: 90vh;
-      width: 90vw;
+      max-height: 90vh; /* Allow it to take more vertical space */
+      width: 90vw; /* Take 90% of viewport width */
+      overflow-y: auto; /* Allow scrolling if content overflows */
     }
     #overlay-img-container, #overlay-text {
-      width: 100%;
-      height: auto;
+      width: 100%; /* Image and text containers take full width */
+      height: auto; /* Height adjusts to content */
     }
     #overlay-img-container {
-      padding: 10px 0;
-      position: relative;
+      padding: 10px 0; /* Add some vertical padding */
+      flex-shrink: 0; /* Prevent shrinking too much */
     }
     #overlay-img {
-      max-height: 300px;
+      max-height: 300px; /* Limit image height to prevent excessive stretching */
+      width: auto; /* Allow image to size itself */
     }
     #overlay-text {
-      padding: 10px 15px;
+      padding: 10px 15px; /* Adjust padding for mobile */
     }
+    /* Adjust buttons in overlay for better touch target */
     #add-image-btn, #delete-image-btn {
       bottom: 15px;
-      right: 15px;
-      width: 44px;
+      right: 15px; /* Adjust right position for add button */
+      width: 44px; /* Larger touch target */
       height: 44px;
       font-size: 28px;
+    }
+    #add-image-btn {
+      right: 65px; /* Shift add button left a bit */
     }
   }
 </style>
@@ -493,6 +563,7 @@
 
   <div id="content-wrapper">
     <div id="top-bar">
+      <button id="hamburger-btn">☰</button> <!-- Hamburger button for mobile -->
       <button id="toggle-theme-btn" title="สลับโหมดมืด/สว่าง">โหมดมืด</button>
     </div>
     <ul id="task-list"></ul>
@@ -520,6 +591,9 @@
     </div>
   </div>
 
+  <!-- Overlay สำหรับซ่อนเนื้อหาเมื่อ Sidebar เปิด (Mobile Only) -->
+  <div id="sidebar-overlay"></div>
+
 <script>
   let categories = [];
   let tasks = [];
@@ -536,6 +610,8 @@
   const addCategoryBtn = document.getElementById('add-category-btn');
   const categoryInput = document.getElementById('category-input');
   const categoryList = document.getElementById('category-list');
+  const hamburgerBtn = document.getElementById('hamburger-btn'); // New
+  const sidebarOverlay = document.getElementById('sidebar-overlay'); // New
 
   const imageOverlay = document.getElementById('image-overlay');
   const overlayImgContainer = document.getElementById('overlay-img-container');
@@ -575,6 +651,10 @@
         saveData();
         renderCategories();
         renderTasks();
+        // Close sidebar on mobile after selecting category
+        if(window.innerWidth <= 600) {
+          toggleSidebar();
+        }
       };
       const delBtn = document.createElement('button');
       delBtn.textContent = '×';
@@ -755,27 +835,28 @@
   }
 
   function renderOverlayImages(images) {
-    overlayImgContainer.innerHTML = '';
+    overlayImgContainer.innerHTML = ''; // Clear previous content
+
+    // Create the main image element
+    const mainImgElement = document.createElement('img');
+    mainImgElement.id = 'overlay-img';
+    mainImgElement.alt = 'รูปงานเต็ม';
 
     if (images && images.length > 0) {
-      const mainImg = document.createElement('img');
-      mainImg.id = 'overlay-img';
-      mainImg.src = images[currentViewingImageIndex];
-      mainImg.alt = 'รูปงานเต็ม';
-      overlayImgContainer.appendChild(mainImg);
+      mainImgElement.src = images[currentViewingImageIndex];
+      mainImgElement.classList.remove('no-image'); // Remove no-image class
     } else {
-      // กรณีไม่มีรูป ให้แสดงกล่องสีขาวแทน
-      const placeholder = document.createElement('div');
-      placeholder.style.width = '100%';
-      placeholder.style.height = '100%';
-      placeholder.style.backgroundColor = 'white';
-      overlayImgContainer.appendChild(placeholder);
+      mainImgElement.src = ''; // No image source
+      mainImgElement.classList.add('no-image'); // Add no-image class for white background
     }
+    overlayImgContainer.appendChild(mainImgElement);
 
+    // Append buttons
     overlayImgContainer.appendChild(addImageBtn);
     overlayImgContainer.appendChild(deleteImageBtn);
-    overlayImgContainer.appendChild(addImageInput);
+    overlayImgContainer.appendChild(addImageInput); // Keep input field here for functionality
 
+    // Render thumbnails if multiple images exist
     if(images && images.length > 1){
       const thumbContainer = document.createElement('div');
       thumbContainer.style.position = 'absolute';
@@ -785,6 +866,7 @@
       thumbContainer.style.display = 'flex';
       thumbContainer.style.gap = '8px';
       thumbContainer.style.justifyContent = 'center';
+      thumbContainer.style.zIndex = '6'; /* Above other elements except close button */
       overlayImgContainer.appendChild(thumbContainer);
 
       images.forEach((src, i) => {
@@ -799,9 +881,7 @@
         thumb.title = `รูปที่ ${i+1}`;
         thumb.onclick = () => {
           currentViewingImageIndex = i;
-          if(images.length > 0) {
-            overlayImg.src = src;
-          }
+          mainImgElement.src = src;
           Array.from(thumbContainer.children).forEach(c => c.style.border = '2px solid transparent');
           thumb.style.border = '2px solid #0078d4';
         };
@@ -812,7 +892,15 @@
 
   function closeOverlay() {
     imageOverlay.style.display = 'none';
+    // Clear dynamic content from container
     overlayImgContainer.innerHTML = '';
+    // Re-append buttons and input for next use
+    overlayImgContainer.appendChild(overlayImg); // Re-add the main image element
+    overlayImgContainer.appendChild(addImageBtn);
+    overlayImgContainer.appendChild(deleteImageBtn);
+    overlayImgContainer.appendChild(addImageInput);
+
+
     overlayTitle.textContent = '';
     overlayDesc.textContent = '';
     currentViewingTaskIndex = null;
@@ -846,8 +934,8 @@
         }
         tasks[currentViewingTaskIndex].images.push(event.target.result);
         saveData();
-        renderTasks();
-        showImageOverlay(currentViewingTaskIndex);
+        renderTasks(); // Re-render task list to show updated thumbnail if applicable
+        showImageOverlay(currentViewingTaskIndex); // Re-open overlay to show new image
       }
     };
     reader.readAsDataURL(file);
@@ -856,27 +944,43 @@
 
   deleteImageBtn.addEventListener('click', () => {
     if (currentViewingTaskIndex === null) return;
-    const images = tasks[currentViewingTaskIndex].images;
-    if (!images || images.length === 0) return;
-
-    images.splice(currentViewingImageIndex, 1);
-
-    if (images.length === 0) {
-      tasks[currentViewingTaskIndex].images = [];
-      saveData();
-      renderTasks();
-      closeOverlay();
+    const task = tasks[currentViewingTaskIndex];
+    if (!task.images || task.images.length === 0) {
+      alert('ไม่มีรูปภาพให้ลบ');
       return;
     }
 
-    if (currentViewingImageIndex >= images.length) {
-      currentViewingImageIndex = images.length - 1;
-    }
+    if (confirm('ยืนยันที่จะลบรูปภาพนี้ใช่หรือไม่?')) {
+      task.images.splice(currentViewingImageIndex, 1);
 
-    saveData();
-    renderTasks();
-    showImageOverlay(currentViewingTaskIndex);
+      if (task.images.length === 0) {
+        // If no images left, ensure images array is empty and close overlay
+        task.images = [];
+        saveData();
+        renderTasks();
+        closeOverlay();
+        return;
+      }
+
+      // Adjust index if the last image was deleted
+      if (currentViewingImageIndex >= task.images.length) {
+        currentViewingImageIndex = task.images.length - 1;
+      }
+
+      saveData();
+      renderTasks(); // Re-render task list to update thumbnail if needed
+      showImageOverlay(currentViewingTaskIndex); // Re-open overlay to show updated images
+    }
   });
+
+  // Sidebar toggle functionality
+  function toggleSidebar() {
+    sidebar.classList.toggle('sidebar-open');
+    sidebarOverlay.classList.toggle('visible');
+  }
+
+  hamburgerBtn.addEventListener('click', toggleSidebar);
+  sidebarOverlay.addEventListener('click', toggleSidebar); // Close sidebar when clicking outside
 
   loadData();
   renderCategories();
