@@ -7,6 +7,7 @@
   <title>ระบบจัดการงาน + หมวดหมู่ + ดูงานเต็มหน้าจอ + เพิ่ม/ลบรูปภาพหลายรูป (รองรับมือถือ)</title>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <style>
     :root {
       --sidebar-bg-light: #f5f5f7;
@@ -16,7 +17,6 @@
       --sidebar-text-dark: #ccc;
       --sidebar-border-dark: #333;
     }
-
     body {
       font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
       margin: 0;
@@ -27,12 +27,10 @@
       overflow: hidden;
       transition: background 0.3s, color 0.3s;
     }
-
     body.dark-mode {
       background: #121212;
       color: #ddd;
     }
-
     #sidebar {
       width: 260px;
       background: var(--sidebar-bg-light);
@@ -50,13 +48,11 @@
       transition: background 0.3s, color 0.3s, border-color 0.3s, left 0.3s ease-in-out;
       z-index: 100;
     }
-
     body.dark-mode #sidebar {
       background: var(--sidebar-bg-dark);
       color: var(--sidebar-text-dark);
       border-color: var(--sidebar-border-dark);
     }
-
     #sidebar h2 {
       margin-top: 0;
       margin-bottom: 15px;
@@ -65,14 +61,12 @@
       color: inherit;
       white-space: nowrap;
     }
-
     #category-list {
       list-style: none;
       padding: 0;
       flex-grow: 1;
       margin-bottom: 10px;
     }
-
     #category-list li {
       padding: 10px 12px;
       margin-bottom: 6px;
@@ -86,13 +80,11 @@
       align-items: center;
       white-space: nowrap;
     }
-
     #category-list li.active,
     #category-list li:hover {
       background: #0078d4;
       color: white;
     }
-
     #category-list li button.delete-cat-btn {
       background: transparent;
       border: none;
@@ -103,18 +95,15 @@
       line-height: 1;
       transition: color 0.3s;
     }
-
     #category-list li button.delete-cat-btn:hover {
       color: #ff4d4f;
     }
-
     #new-category {
       display: flex;
       gap: 6px;
       max-width: 100%;
       background: inherit;
     }
-
     #new-category input {
       flex-grow: 1;
       padding: 8px 12px;
@@ -127,13 +116,11 @@
       background-color: #fff;
       color: #222;
     }
-
     body.dark-mode #new-category input {
       background-color: #333;
       color: #eee;
       border-color: #555;
     }
-
     #new-category button {
       padding: 8px 14px;
       border: none;
@@ -147,11 +134,9 @@
       white-space: nowrap;
       box-sizing: border-box;
     }
-
     #new-category button:hover {
       background: #005a9e;
     }
-
     #content-wrapper {
       margin-left: 260px;
       width: calc(100vw - 260px);
@@ -165,14 +150,12 @@
       background: transparent;
       transition: background 0.3s, color 0.3s, margin-left 0.3s ease-in-out, width 0.3s ease-in-out;
     }
-
     #top-bar {
       display: flex;
       justify-content: flex-end;
       gap: 12px;
       margin-bottom: 14px;
     }
-
     #toggle-theme-btn {
       padding: 6px 14px;
       border: none;
@@ -184,11 +167,9 @@
       background: #0078d4;
       color: white;
     }
-
     #toggle-theme-btn:hover {
       background: #005a9e;
     }
-
     #logout-btn {
       padding: 6px 14px;
       border: none;
@@ -200,11 +181,9 @@
       color: white;
       transition: background 0.3s;
     }
-
     #logout-btn:hover {
       background: #b02a37;
     }
-
     #hamburger-btn {
       display: none;
       background: #0078d4;
@@ -218,7 +197,6 @@
       margin-right: auto;
       z-index: 101;
     }
-
     #input-tab {
       position: fixed;
       bottom: 20px;
@@ -238,12 +216,10 @@
       z-index: 999;
       transition: background-color 0.3s;
     }
-
     body.dark-mode #input-tab {
       background-color: #222;
       border-color: #444;
     }
-
     #task-text-input {
       flex-grow: 1;
       border: none;
@@ -255,13 +231,11 @@
       transition: background-color 0.3s, color 0.3s;
       color: #222;
     }
-
     body.dark-mode #task-text-input {
       background-color: #333;
       color: #eee;
       border-color: #555;
     }
-
     #add-task-btn {
       margin-left: 14px;
       background-color: #0078d4;
@@ -273,11 +247,9 @@
       font-weight: 600;
       transition: background-color 0.3s;
     }
-
     #add-task-btn:hover {
       background-color: #005a9e;
     }
-
     ul#task-list {
       list-style: none;
       padding: 0;
@@ -286,7 +258,6 @@
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: 20px;
     }
-
     ul#task-list li {
       display: flex;
       flex-direction: column;
@@ -302,13 +273,11 @@
       color: #333;
       position: relative;
     }
-
     body.dark-mode ul#task-list li {
       background: #222;
       box-shadow: 0 2px 12px rgba(255, 255, 255, 0.1);
       color: #ddd;
     }
-
     ul#task-list li img {
       width: 100%;
       height: 160px;
@@ -317,7 +286,6 @@
       margin-bottom: 12px;
       cursor: pointer;
     }
-
     ul#task-list li input[type="text"] {
       font-weight: 600;
       margin-bottom: 10px;
@@ -331,12 +299,10 @@
       color: inherit;
       transition: border-color 0.3s;
     }
-
     ul#task-list li input[type="text"]:focus {
       border-color: #0078d4;
       outline: none;
     }
-
     ul#task-list li textarea {
       width: 100%;
       box-sizing: border-box;
@@ -354,12 +320,10 @@
       overflow-wrap: break-word;
       max-height: 200px;
     }
-
     ul#task-list li textarea:focus {
       border-color: #0078d4;
       outline: none;
     }
-
     ul#task-list li button {
       margin-left: 8px;
       padding: 6px 12px;
@@ -369,25 +333,20 @@
       font-weight: 600;
       transition: background 0.3s;
     }
-
     ul#task-list li .delete-btn {
       background: #dc3545;
       color: white;
     }
-
     ul#task-list li .delete-btn:hover {
       background: #b02a37;
     }
-
     ul#task-list li .view-btn {
       background: #0078d4;
       color: white;
     }
-
     ul#task-list li .view-btn:hover {
       background: #005a9e;
     }
-
     #image-overlay {
       display: none;
       position: fixed;
@@ -400,11 +359,9 @@
       align-items: center;
       z-index: 1100;
     }
-
     #image-overlay.visible {
       display: flex;
     }
-
     #image-overlay>div {
       position: relative;
       width: 80vw;
@@ -418,12 +375,10 @@
       box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
       font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     }
-
     body.dark-mode #image-overlay>div {
       background: #222;
       color: #ddd;
     }
-
     #overlay-img-container {
       position: relative;
       width: 50%;
@@ -433,13 +388,11 @@
       align-items: center;
       overflow: hidden;
     }
-
     #overlay-img-container img {
       max-width: 100%;
       max-height: 100%;
       object-fit: contain;
     }
-
     #add-image-btn {
       position: absolute;
       bottom: 10px;
@@ -458,11 +411,9 @@
       transition: background 0.3s;
       z-index: 5;
     }
-
     #add-image-btn:hover {
       background: rgba(0, 120, 212, 1);
     }
-
     #delete-image-btn {
       position: absolute;
       bottom: 10px;
@@ -481,11 +432,9 @@
       transition: background 0.3s;
       z-index: 5;
     }
-
     #delete-image-btn:hover {
       background: rgba(180, 30, 45, 1);
     }
-
     #overlay-text {
       width: 50%;
       padding: 20px;
@@ -494,18 +443,15 @@
       display: flex;
       flex-direction: column;
     }
-
     #overlay-text h3 {
       margin-top: 0;
       margin-bottom: 12px;
     }
-
     #overlay-text p {
       margin: 0 0 12px 0;
       white-space: pre-line;
       word-break: break-word;
     }
-
     #overlay-close {
       position: absolute;
       top: 10px;
@@ -521,21 +467,17 @@
       z-index: 10;
       transition: background 0.3s;
     }
-
     #overlay-close:hover {
       background: #ff4d4f;
       color: white;
     }
-
     body.dark-mode #overlay-close:hover {
       background: #b02a37;
       color: #fff;
     }
-
     input[type="file"] {
       display: none;
     }
-
     #overlay-img.no-image {
       background: #fff;
       display: flex;
@@ -546,7 +488,6 @@
       height: 100%;
       width: 100%;
     }
-
     #sidebar-overlay {
       display: none;
       position: fixed;
@@ -557,11 +498,9 @@
       background: rgba(0,0,0,0.3);
       z-index: 99;
     }
-
     #sidebar-overlay.visible {
       display: block;
     }
-
     @media (max-width: 600px) {
       #sidebar {
         left: -260px;
@@ -633,21 +572,34 @@
   <div id="sidebar-overlay"></div>
 
   <script>
-    // --- Firebase Auth Setup ---
+    // --- Firebase Auth & Firestore Setup ---
     const firebaseConfig = {
       apiKey: "AIzaSyB0uJoVfeo8pgeTSBnpIS0_Wn0crK77tn8",
-      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-      projectId: "YOUR_PROJECT_ID"
+      authDomain: "gasifanieprojectlogin.firebaseapp.com",
+      projectId: "gasifanieprojectlogin"
       // ... ใส่ค่าที่เหลือจาก Firebase Console ถ้ามี
     };
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
+    const db = firebase.firestore();
 
-    // ถ้าไม่ได้ล็อกอิน ให้ redirect ไป login.html
-    auth.onAuthStateChanged(user => {
-      if (!user) {
+    let user = null;
+    let categories = [];
+    let tasks = [];
+    let currentCategory = null;
+    let currentViewingTaskIndex = null;
+    let currentViewingImageIndex = 0;
+
+    // รอให้ล็อกอินก่อน แล้วโหลดข้อมูล
+    auth.onAuthStateChanged(async u => {
+      if (!u) {
         window.location.href = "login.html";
+        return;
       }
+      user = u;
+      await loadDataFromFirestore();
+      renderCategories();
+      renderTasks();
     });
 
     // ปุ่มออกจากระบบ
@@ -662,12 +614,49 @@
       }
     });
 
-    let categories = [];
-    let tasks = [];
-    let currentCategory = null;
-    let currentViewingTaskIndex = null;
-    let currentViewingImageIndex = 0;
+    // โหลดข้อมูลจาก Firestore
+    async function loadDataFromFirestore() {
+      // หมวดหมู่
+      const catSnap = await db.collection('users').doc(user.uid).collection('categories').get();
+      categories = catSnap.empty ? ["ทั่วไป"] : catSnap.docs.map(doc => doc.data().name);
+      if (categories.length === 0) categories = ["ทั่วไป"];
+      currentCategory = categories[0];
 
+      // งาน
+      const taskSnap = await db.collection('users').doc(user.uid).collection('tasks').get();
+      tasks = taskSnap.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+    }
+
+    // บันทึกหมวดหมู่
+    async function saveCategoriesToFirestore() {
+      const catCol = db.collection('users').doc(user.uid).collection('categories');
+      // ลบทั้งหมดก่อน แล้วเพิ่มใหม่ (ง่ายสุดสำหรับ list สั้น)
+      const snap = await catCol.get();
+      const batch = db.batch();
+      snap.forEach(doc => batch.delete(doc.ref));
+      categories.forEach(name => {
+        const ref = catCol.doc();
+        batch.set(ref, { name });
+      });
+      await batch.commit();
+    }
+
+    // บันทึกงาน
+    async function saveTasksToFirestore() {
+      const taskCol = db.collection('users').doc(user.uid).collection('tasks');
+      // ลบทั้งหมดก่อน แล้วเพิ่มใหม่ (ง่ายสุดสำหรับ list สั้น)
+      const snap = await taskCol.get();
+      const batch = db.batch();
+      snap.forEach(doc => batch.delete(doc.ref));
+      tasks.forEach(task => {
+        const ref = taskCol.doc();
+        const { id, ...data } = task;
+        batch.set(ref, data);
+      });
+      await batch.commit();
+    }
+
+    // --- ส่วน render และ event handler เดิม ปรับให้ใช้ Firestore ---
     const sidebar = document.getElementById('sidebar');
     const contentWrapper = document.getElementById('content-wrapper');
     const taskList = document.getElementById('task-list');
@@ -690,17 +679,6 @@
     const deleteImageBtn = document.getElementById('delete-image-btn');
     const addImageInput = document.getElementById('add-image-input');
 
-    function loadData() {
-      categories = JSON.parse(localStorage.getItem('categories') || '["ทั่วไป"]');
-      tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
-      currentCategory = categories[0];
-    }
-
-    function saveData() {
-      localStorage.setItem('categories', JSON.stringify(categories));
-      localStorage.setItem('tasks', JSON.stringify(tasks));
-    }
-
     function renderCategories() {
       categoryList.innerHTML = '';
       categories.forEach(cat => {
@@ -715,7 +693,7 @@
         const delBtn = document.createElement('button');
         delBtn.className = 'delete-cat-btn';
         delBtn.innerHTML = '&times;';
-        delBtn.onclick = e => {
+        delBtn.onclick = async e => {
           e.stopPropagation();
           if (categories.length === 1) {
             alert('ต้องมีหมวดหมู่ อย่างน้อย 1 หมวดหมู่');
@@ -727,7 +705,8 @@
             if (currentCategory === cat) {
               currentCategory = categories.length ? categories[0] : null;
             }
-            saveData();
+            await saveCategoriesToFirestore();
+            await saveTasksToFirestore();
             renderCategories();
             renderTasks();
           }
@@ -756,9 +735,9 @@
         const titleInput = document.createElement('input');
         titleInput.type = 'text';
         titleInput.value = task.text || '';
-        titleInput.addEventListener('change', e => {
+        titleInput.addEventListener('change', async e => {
           tasks[globalIndex].text = e.target.value.trim();
-          saveData();
+          await saveTasksToFirestore();
         });
         li.appendChild(titleInput);
 
@@ -766,9 +745,9 @@
         const descTextarea = document.createElement('textarea');
         descTextarea.value = task.description;
         descTextarea.placeholder = 'พิมพ์ข้อความย่อย...';
-        descTextarea.addEventListener('change', e => {
+        descTextarea.addEventListener('change', async e => {
           tasks[globalIndex].description = e.target.value;
-          saveData();
+          await saveTasksToFirestore();
         });
         descTextarea.addEventListener('input', e => {
           autoResizeTextarea(e.target);
@@ -786,9 +765,9 @@
         const delBtn = document.createElement('button');
         delBtn.textContent = 'ลบ';
         delBtn.className = 'delete-btn';
-        delBtn.onclick = () => {
+        delBtn.onclick = async () => {
           tasks.splice(globalIndex, 1);
-          saveData();
+          await saveTasksToFirestore();
           renderTasks();
         };
         li.appendChild(delBtn);
@@ -802,7 +781,7 @@
       textarea.style.height = (textarea.scrollHeight) + 'px';
     }
 
-    function addTask(text, image = null) {
+    async function addTask(text, image = null) {
       text = (text || '').trim();
       if (!text) return;
       tasks.push({
@@ -811,7 +790,7 @@
         images: image ? [image] : [],
         category: currentCategory
       });
-      saveData();
+      await saveTasksToFirestore();
       renderTasks();
       taskTextInput.value = '';
     }
@@ -826,7 +805,7 @@
       }
     });
 
-    addCategoryBtn.addEventListener('click', () => {
+    addCategoryBtn.addEventListener('click', async () => {
       const cat = categoryInput.value.trim();
       if (!cat) return;
       if (categories.includes(cat)) {
@@ -835,7 +814,7 @@
       }
       categories.push(cat);
       currentCategory = cat;
-      saveData();
+      await saveCategoriesToFirestore();
       renderCategories();
       renderTasks();
       categoryInput.value = '';
@@ -924,7 +903,7 @@
       addImageInput.click();
     });
 
-    addImageInput.addEventListener('change', e => {
+    addImageInput.addEventListener('change', async e => {
       const files = Array.from(e.target.files);
       if (!files.length) return;
       const task = tasks[currentViewingTaskIndex];
@@ -932,12 +911,12 @@
       files.forEach(file => {
         if (file.type.startsWith('image/')) {
           const reader = new FileReader();
-          reader.onload = evt => {
+          reader.onload = async evt => {
             task.images = task.images || [];
             task.images.push(evt.target.result);
             loaded++;
             if (loaded === files.length) {
-              saveData();
+              await saveTasksToFirestore();
               renderOverlayImages(task.images);
               renderTasks();
             }
@@ -948,30 +927,10 @@
       addImageInput.value = '';
     });
 
-    deleteImageBtn.addEventListener('click', () => {
+    deleteImageBtn.addEventListener('click', async () => {
       const task = tasks[currentViewingTaskIndex];
       if (!task.images || task.images.length === 0) return;
       if (!confirm('ลบรูปนี้ใช่หรือไม่?')) return;
       task.images.splice(currentViewingImageIndex, 1);
       if (currentViewingImageIndex > 0) currentViewingImageIndex--;
-      saveData();
-      renderOverlayImages(task.images);
-      renderTasks();
-    });
-
-    // Sidebar toggle functionality
-    function toggleSidebar() {
-      sidebar.classList.toggle('visible');
-      sidebarOverlay.classList.toggle('visible');
-    }
-
-    hamburgerBtn.addEventListener('click', toggleSidebar);
-    sidebarOverlay.addEventListener('click', toggleSidebar);
-
-    loadData();
-    renderCategories();
-    renderTasks();
-  </script>
-</body>
-
-</html>
+     
