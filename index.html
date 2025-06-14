@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>ระบบจัดการงาน + หมวดหมู่ + ดูงานเต็มหน้าจอ + เพิ่ม/ลบรูปภาพหลายรูป (รองรับมือถือ + ซ่อน sidebar)</title>
+<title>ระบบจัดการงาน + หมวดหมู่ + ดูงานเต็มหน้าจอ + เพิ่ม/ลบรูปภาพหลายรูป (รองรับล็อกอิน Firebase)</title>
 <style>
   :root {
     --sidebar-bg-light: #f5f5f7;
@@ -28,7 +28,6 @@
     color: #ddd;
   }
 
-  /* Sidebar Styles (Default for Desktop) */
   #sidebar {
     width: 260px;
     background: var(--sidebar-bg-light);
@@ -135,7 +134,6 @@
     background: #005a9e;
   }
 
-  /* Content Wrapper Styles */
   #content-wrapper {
     margin-left: 260px;
     width: calc(100vw - 260px);
@@ -170,22 +168,6 @@
     background: #005a9e;
   }
 
-  /* Hamburger Button (Mobile Only) */
-  #hamburger-btn {
-    display: none;
-    background: #0078d4;
-    color: white;
-    border: none;
-    padding: 8px 12px;
-    font-size: 20px;
-    line-height: 1;
-    cursor: pointer;
-    border-radius: 8px;
-    margin-right: auto;
-    z-index: 101;
-  }
-
-  /* Input Tab Styles */
   #input-tab {
     position: fixed;
     bottom: 20px;
@@ -240,7 +222,6 @@
     background-color: #005a9e;
   }
 
-  /* Task List & Item Styles */
   ul#task-list {
     list-style: none;
     padding: 0;
@@ -339,7 +320,6 @@
     background: #005a9e;
   }
 
-  /* Image Overlay (Full View) Styles */
   #image-overlay {
     display: none;
     position: fixed;
@@ -468,7 +448,6 @@
   input[type="file"] {
     display: none;
   }
-  /* กรณีไม่มีรูปภาพใน overlay ให้พื้นหลังสีขาว */
   #overlay-img.no-image {
     background-color: white;
     width: 100%;
@@ -476,56 +455,8 @@
     object-fit: contain;
   }
 
-  /* Sidebar overlay (mobile only) */
-  #sidebar-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0,0,0,0.5);
-    z-index: 1000;
-    transition: opacity 0.3s ease-in-out;
-  }
-  #sidebar-overlay.visible {
-    display: block;
-    opacity: 1;
-  }
-
   /* Responsive for Mobile */
   @media (max-width: 600px) {
-    /* Sidebar adjustments for mobile */
-    #sidebar {
-      left: -260px;
-      z-index: 1001;
-    }
-    #sidebar.sidebar-open {
-      left: 0;
-    }
-    #content-wrapper {
-      margin-left: 0;
-      width: 100vw;
-    }
-    #top-bar {
-      justify-content: space-between;
-    }
-    #hamburger-btn {
-      display: block;
-    }
-
-    /* Input tab width and padding for mobile */
-    #input-tab {
-      width: calc(100% - 40px);
-      max-width: none;
-      padding: 12px 20px;
-      bottom: 20px;
-      left: 20px;
-      transform: none;
-      border-radius: 30px;
-    }
-
-    /* Image Overlay adjustments for mobile */
     #image-overlay > div {
       flex-direction: column;
       height: auto;
@@ -548,7 +479,6 @@
     #overlay-text {
       padding: 10px 15px;
     }
-    /* Adjust buttons in overlay for better touch target */
     #add-image-btn, #delete-image-btn {
       bottom: 15px;
       right: 15px;
@@ -574,8 +504,8 @@
 
   <div id="content-wrapper">
     <div id="top-bar">
-      <button id="hamburger-btn" aria-label="เปิดเมนู">☰</button>
       <button id="toggle-theme-btn" title="สลับโหมดมืด/สว่าง">โหมดมืด</button>
+      <button id="logout-btn" title="ออกจากระบบ" style="margin-left: 10px; background:#dc3545; color:#fff; border:none; border-radius:8px; padding:6px 12px; cursor:pointer;">ออกจากระบบ</button>
     </div>
     <ul id="task-list"></ul>
   </div>
@@ -585,7 +515,6 @@
     <button id="add-task-btn">เพิ่ม</button>
   </div>
 
-  <!-- Overlay แสดงงานเต็ม พร้อมเพิ่ม/ลบรูป -->
   <div id="image-overlay" onclick="if(event.target.id==='image-overlay') closeOverlay()">
     <div>
       <div id="overlay-close" title="ปิด" role="button" tabindex="0">×</div>
@@ -602,27 +531,37 @@
     </div>
   </div>
 
-  <!-- Overlay สำหรับซ่อนเนื้อหาเมื่อ Sidebar เปิด (Mobile Only) -->
-  <div id="sidebar-overlay"></div>
-
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script>
+  // กรอกค่าจาก Firebase Console ของคุณ
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    // ... เพิ่มเติมตาม Firebase Console
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  // ตัวแปรเก็บข้อมูลในหน้านี้
   let categories = [];
   let tasks = [];
   let currentCategory = null;
   let currentViewingTaskIndex = null;
   let currentViewingImageIndex = 0;
 
-  const sidebar = document.getElementById('sidebar');
-  const contentWrapper = document.getElementById('content-wrapper');
+  // อ้างอิง element
+  const categoryList = document.getElementById('category-list');
+  const addCategoryBtn = document.getElementById('add-category-btn');
+  const categoryInput = document.getElementById('category-input');
   const taskList = document.getElementById('task-list');
   const taskTextInput = document.getElementById('task-text-input');
   const addTaskBtn = document.getElementById('add-task-btn');
   const toggleThemeBtn = document.getElementById('toggle-theme-btn');
-  const addCategoryBtn = document.getElementById('add-category-btn');
-  const categoryInput = document.getElementById('category-input');
-  const categoryList = document.getElementById('category-list');
-  const hamburgerBtn = document.getElementById('hamburger-btn');
-  const sidebarOverlay = document.getElementById('sidebar-overlay');
+  const logoutBtn = document.getElementById('logout-btn');
 
   const imageOverlay = document.getElementById('image-overlay');
   const overlayImgContainer = document.getElementById('overlay-img-container');
@@ -634,35 +573,99 @@
   const deleteImageBtn = document.getElementById('delete-image-btn');
   const addImageInput = document.getElementById('add-image-input');
 
-  function loadData() {
-    const savedCategories = localStorage.getItem('categories');
-    const savedTasks = localStorage.getItem('tasks');
-    const savedCurrentCategory = localStorage.getItem('currentCategory');
+  // ตรวจสอบสถานะผู้ใช้
+  auth.onAuthStateChanged(user => {
+    if (!user) {
+      // ถ้าไม่ล็อกอิน ให้กลับไปหน้า login
+      window.location.href = 'login.html';
+    } else {
+      // โหลดข้อมูลผู้ใช้
+      loadCategories(user.uid);
+    }
+  });
 
-    categories = savedCategories ? JSON.parse(savedCategories) : ['ทั่วไป'];
-    tasks = savedTasks ? JSON.parse(savedTasks) : [];
-    currentCategory = savedCurrentCategory && categories.includes(savedCurrentCategory)
-      ? savedCurrentCategory
-      : categories[0];
-  }
-  function saveData() {
-    localStorage.setItem('categories', JSON.stringify(categories));
-    localStorage.setItem('tasks', JSON.stringify(tasks));
-    localStorage.setItem('currentCategory', currentCategory);
+  // ออกจากระบบ
+  logoutBtn.addEventListener('click', () => {
+    auth.signOut().then(() => {
+      window.location.href = 'login.html';
+    });
+  });
+
+  // โหลดหมวดหมู่จาก Firestore
+  function loadCategories(uid) {
+    db.collection('categories').where('userId', '==', uid).get()
+      .then(snapshot => {
+        categories = [];
+        snapshot.forEach(doc => {
+          const cat = { id: doc.id, name: doc.data().name };
+          categories.push(cat);
+        });
+        if(categories.length === 0) {
+          // สร้างหมวดหมู่เริ่มต้น
+          addCategory('ทั่วไป', uid, () => {
+            loadCategories(uid);
+          });
+        } else {
+          currentCategory = categories[0].name;
+          renderCategories();
+          loadTasks(uid, currentCategory);
+        }
+      });
   }
 
-  function renderCategories(){
+  // เพิ่มหมวดหมู่ใหม่
+  function addCategory(name, uid, callback) {
+    db.collection('categories').add({
+      userId: uid,
+      name: name
+    }).then(() => {
+      if(callback) callback();
+    });
+  }
+
+  addCategoryBtn.addEventListener('click', () => {
+    const name = categoryInput.value.trim();
+    if(!name) {
+      alert('กรุณาพิมพ์ชื่อหมวดหมู่');
+      return;
+    }
+    const user = auth.currentUser;
+    if(!user) return alert('กรุณาเข้าสู่ระบบ');
+    addCategory(name, user.uid, () => {
+      categoryInput.value = '';
+      loadCategories(user.uid);
+    });
+  });
+
+  // ลบหมวดหมู่
+  function deleteCategory(catId, uid) {
+    if(!confirm('ลบหมวดหมู่และงานทั้งหมดในหมวดหมู่นี้?')) return;
+    // ลบหมวดหมู่
+    db.collection('categories').doc(catId).delete()
+      .then(() => {
+        // ลบงานในหมวดหมู่นี้
+        db.collection('tasks').where('userId', '==', uid).where('categoryId', '==', catId).get()
+          .then(snapshot => {
+            const batch = db.batch();
+            snapshot.forEach(doc => batch.delete(doc.ref));
+            return batch.commit();
+          }).then(() => {
+            loadCategories(uid);
+          });
+      });
+  }
+
+  // แสดงหมวดหมู่ใน sidebar
+  function renderCategories() {
     categoryList.innerHTML = '';
     categories.forEach(cat => {
       const li = document.createElement('li');
-      li.textContent = cat;
-      if(cat === currentCategory) li.classList.add('active');
+      li.textContent = cat.name;
+      if(cat.name === currentCategory) li.classList.add('active');
       li.onclick = () => {
-        currentCategory = cat;
-        saveData();
+        currentCategory = cat.name;
+        loadTasks(auth.currentUser.uid, currentCategory);
         renderCategories();
-        renderTasks();
-        if(window.innerWidth <= 600) toggleSidebar(); // ปิด sidebar เมื่อเลือกหมวดหมู่ในมือถือ
       };
       const delBtn = document.createElement('button');
       delBtn.textContent = '×';
@@ -670,26 +673,33 @@
       delBtn.title = 'ลบหมวดหมู่';
       delBtn.onclick = e => {
         e.stopPropagation();
-        if(confirm(`ลบหมวดหมู่ "${cat}" ใช่หรือไม่?`)){
-          categories = categories.filter(c => c !== cat);
-          tasks = tasks.filter(t => t.category !== cat);
-          if(currentCategory === cat){
-            currentCategory = categories.length ? categories[0] : null;
-          }
-          saveData();
-          renderCategories();
-          renderTasks();
-        }
+        deleteCategory(cat.id, auth.currentUser.uid);
       };
       li.appendChild(delBtn);
       categoryList.appendChild(li);
     });
   }
 
-  function renderTasks(){
+  // โหลดงานจาก Firestore ตามหมวดหมู่และผู้ใช้
+  function loadTasks(uid, categoryName) {
+    // หา categoryId จากชื่อหมวดหมู่
+    const cat = categories.find(c => c.name === categoryName);
+    if(!cat) return;
+    db.collection('tasks').where('userId', '==', uid).where('categoryId', '==', cat.id).get()
+      .then(snapshot => {
+        tasks = [];
+        snapshot.forEach(doc => {
+          const task = { id: doc.id, ...doc.data() };
+          tasks.push(task);
+        });
+        renderTasks();
+      });
+  }
+
+  // แสดงงานในหน้าหลัก
+  function renderTasks() {
     taskList.innerHTML = '';
-    if(!currentCategory) return;
-    tasks.filter(t => t.category === currentCategory).forEach((task, index) => {
+    tasks.forEach((task, index) => {
       const li = document.createElement('li');
 
       if(task.images && task.images.length > 0){
@@ -704,22 +714,17 @@
       titleInput.type = 'text';
       titleInput.value = task.text || '';
       titleInput.addEventListener('change', e => {
-        tasks[index].text = e.target.value.trim();
-        saveData();
+        updateTaskField(task.id, 'text', e.target.value);
       });
       li.appendChild(titleInput);
 
-      if(task.description === undefined) task.description = '';
       const descTextarea = document.createElement('textarea');
-      descTextarea.value = task.description;
+      descTextarea.value = task.description || '';
       descTextarea.placeholder = 'พิมพ์ข้อความย่อย...';
       descTextarea.addEventListener('change', e => {
-        tasks[index].description = e.target.value;
-        saveData();
+        updateTaskField(task.id, 'description', e.target.value);
       });
-      descTextarea.addEventListener('input', e => {
-        autoResizeTextarea(e.target);
-      });
+      descTextarea.addEventListener('input', e => autoResizeTextarea(e.target));
       autoResizeTextarea(descTextarea);
       li.appendChild(descTextarea);
 
@@ -733,105 +738,60 @@
       const delBtn = document.createElement('button');
       delBtn.textContent = 'ลบ';
       delBtn.className = 'delete-btn';
-      delBtn.onclick = () => {
-        tasks.splice(index,1);
-        saveData();
-        renderTasks();
-      };
+      delBtn.onclick = () => deleteTask(task.id);
       li.appendChild(delBtn);
 
       taskList.appendChild(li);
     });
   }
 
+  // ปรับขนาด textarea อัตโนมัติ
   function autoResizeTextarea(textarea) {
     textarea.style.height = 'auto';
     textarea.style.height = textarea.scrollHeight + 'px';
   }
 
-  function addTask(text, image=null){
-    if(!text.trim()){
+  // เพิ่มงานใหม่
+  addTaskBtn.addEventListener('click', () => {
+    const text = taskTextInput.value.trim();
+    if(!text) {
       alert('กรุณาพิมพ์ข้อความงานก่อนเพิ่ม');
       return;
     }
-    if(!currentCategory){
-      alert('กรุณาเลือกหมวดหมู่ก่อนเพิ่มงาน');
-      return;
-    }
-    tasks.push({text: text.trim(), description: '', images: image ? [image] : [], category: currentCategory});
-    saveData();
-    renderTasks();
-    taskTextInput.value = '';
+    const user = auth.currentUser;
+    if(!user) return alert('กรุณาเข้าสู่ระบบ');
+    const cat = categories.find(c => c.name === currentCategory);
+    if(!cat) return alert('กรุณาเลือกหมวดหมู่ก่อนเพิ่มงาน');
+    db.collection('tasks').add({
+      userId: user.uid,
+      categoryId: cat.id,
+      text: text,
+      description: '',
+      images: [],
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(() => {
+      taskTextInput.value = '';
+      loadTasks(user.uid, currentCategory);
+    });
+  });
+
+  // อัปเดตฟิลด์งาน
+  function updateTaskField(taskId, field, value) {
+    db.collection('tasks').doc(taskId).update({
+      [field]: value
+    });
   }
 
-  addTaskBtn.addEventListener('click', () => {
-    addTask(taskTextInput.value);
-  });
+  // ลบงาน
+  function deleteTask(taskId) {
+    if(!confirm('ยืนยันการลบงานนี้?')) return;
+    db.collection('tasks').doc(taskId).delete()
+      .then(() => {
+        loadTasks(auth.currentUser.uid, currentCategory);
+      });
+  }
 
-  taskTextInput.addEventListener('keypress', e => {
-    if(e.key === 'Enter'){
-      addTask(taskTextInput.value);
-    }
-  });
-
-  addCategoryBtn.addEventListener('click', () => {
-    const newCat = categoryInput.value.trim();
-    if(!newCat){
-      alert('กรุณาพิมพ์ชื่อหมวดหมู่');
-      return;
-    }
-    if(categories.includes(newCat)){
-      alert('หมวดหมู่นี้มีอยู่แล้ว');
-      return;
-    }
-    categories.push(newCat);
-    currentCategory = newCat;
-    categoryInput.value = '';
-    saveData();
-    renderCategories();
-    renderTasks();
-  });
-
-  toggleThemeBtn.addEventListener('click', () => {
-    document.body.classList.toggle('dark-mode');
-    toggleThemeBtn.textContent = document.body.classList.contains('dark-mode') ? 'โหมดสว่าง' : 'โหมดมืด';
-  });
-
-  const inputTab = document.getElementById('input-tab');
-  inputTab.addEventListener('dragover', e => {
-    e.preventDefault();
-    inputTab.classList.add('dragover');
-  });
-  inputTab.addEventListener('dragleave', e => {
-    e.preventDefault();
-    inputTab.classList.remove('dragover');
-  });
-  inputTab.addEventListener('drop', e => {
-    e.preventDefault();
-    inputTab.classList.remove('dragover');
-
-    const files = e.dataTransfer.files;
-    if(files.length === 0) return;
-
-    const file = files[0];
-    if(!file.type.startsWith('image/')){
-      alert('กรุณาลากเฉพาะไฟล์รูปภาพ');
-      return;
-    }
-
-    const text = taskTextInput.value.trim();
-    if(!text){
-      alert('กรุณาพิมพ์ข้อความงานก่อนลากรูปภาพ');
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = function(event){
-      addTask(text, event.target.result);
-    };
-    reader.readAsDataURL(file);
-  });
-
+  // แสดง overlay งานเต็ม
   function showImageOverlay(taskIndex) {
     const task = tasks[taskIndex];
     currentViewingTaskIndex = taskIndex;
@@ -842,9 +802,9 @@
     imageOverlay.style.display = 'flex';
   }
 
+  // แสดงรูปภาพใน overlay
   function renderOverlayImages(images) {
     overlayImgContainer.innerHTML = '';
-
     if (images && images.length > 0) {
       const mainImg = document.createElement('img');
       mainImg.id = 'overlay-img';
@@ -858,11 +818,9 @@
       placeholder.style.backgroundColor = 'white';
       overlayImgContainer.appendChild(placeholder);
     }
-
     overlayImgContainer.appendChild(addImageBtn);
     overlayImgContainer.appendChild(deleteImageBtn);
     overlayImgContainer.appendChild(addImageInput);
-
     if(images && images.length > 1){
       const thumbContainer = document.createElement('div');
       thumbContainer.style.position = 'absolute';
@@ -874,7 +832,6 @@
       thumbContainer.style.justifyContent = 'center';
       thumbContainer.style.zIndex = '6';
       overlayImgContainer.appendChild(thumbContainer);
-
       images.forEach((src, i) => {
         const thumb = document.createElement('img');
         thumb.src = src;
@@ -898,6 +855,7 @@
     }
   }
 
+  // ปิด overlay
   function closeOverlay() {
     imageOverlay.style.display = 'none';
     overlayImgContainer.innerHTML = '';
@@ -908,7 +866,6 @@
   }
 
   overlayClose.addEventListener('click', closeOverlay);
-
   imageOverlay.addEventListener('click', e => {
     if(e.target === imageOverlay){
       closeOverlay();
@@ -929,13 +886,18 @@
     const reader = new FileReader();
     reader.onload = function(event) {
       if (currentViewingTaskIndex !== null) {
-        if (!tasks[currentViewingTaskIndex].images) {
-          tasks[currentViewingTaskIndex].images = [];
+        const task = tasks[currentViewingTaskIndex];
+        if (!task.images) {
+          task.images = [];
         }
-        tasks[currentViewingTaskIndex].images.push(event.target.result);
-        saveData();
-        renderTasks();
-        showImageOverlay(currentViewingTaskIndex);
+        task.images.push(event.target.result);
+        // อัปเดตรูปภาพใน Firestore
+        db.collection('tasks').doc(task.id).update({
+          images: task.images
+        }).then(() => {
+          loadTasks(auth.currentUser.uid, currentCategory);
+          showImageOverlay(currentViewingTaskIndex);
+        });
       }
     };
     reader.readAsDataURL(file);
@@ -949,41 +911,38 @@
       alert('ไม่มีรูปภาพให้ลบ');
       return;
     }
-
-    if (confirm('ยืนยันที่จะลบรูปภาพนี้ใช่หรือไม่?')) {
-      task.images.splice(currentViewingImageIndex, 1);
-
+    if (!confirm('ยืนยันที่จะลบรูปภาพนี้ใช่หรือไม่?')) return;
+    task.images.splice(currentViewingImageIndex, 1);
+    if (task.images.length === 0) {
+      task.images = [];
+    }
+    db.collection('tasks').doc(task.id).update({
+      images: task.images
+    }).then(() => {
+      loadTasks(auth.currentUser.uid, currentCategory);
       if (task.images.length === 0) {
-        task.images = [];
-        saveData();
-        renderTasks();
         closeOverlay();
-        return;
+      } else {
+        if (currentViewingImageIndex >= task.images.length) {
+          currentViewingImageIndex = task.images.length - 1;
+        }
+        showImageOverlay(currentViewingTaskIndex);
       }
+    });
+  });
 
-      if (currentViewingImageIndex >= task.images.length) {
-        currentViewingImageIndex = task.images.length - 1;
-      }
-
-      saveData();
-      renderTasks();
-      showImageOverlay(currentViewingTaskIndex);
+  // เพิ่มงานด้วย Enter ใน input
+  taskTextInput.addEventListener('keypress', e => {
+    if(e.key === 'Enter'){
+      addTaskBtn.click();
     }
   });
 
-  // Sidebar toggle functionality
-  function toggleSidebar() {
-    sidebar.classList.toggle('sidebar-open');
-    sidebarOverlay.classList.toggle('visible');
-  }
-
-  hamburgerBtn.addEventListener('click', toggleSidebar);
-  sidebarOverlay.addEventListener('click', toggleSidebar);
-
-  loadData();
-  renderCategories();
-  renderTasks();
-  toggleThemeBtn.textContent = 'โหมดมืด';
+  // สลับโหมดมืด/สว่าง
+  toggleThemeBtn.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+    toggleThemeBtn.textContent = document.body.classList.contains('dark-mode') ? 'โหมดสว่าง' : 'โหมดมืด';
+  });
 </script>
 </body>
 </html>
