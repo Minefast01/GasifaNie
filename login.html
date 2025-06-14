@@ -4,8 +4,6 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>เข้าสู่ระบบ</title>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <style>
   body { font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; padding: 20px; background: #f0f0f0; }
   .container { max-width: 400px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 0 12px rgba(0,0,0,0.1); }
@@ -30,54 +28,57 @@
     <div id="status"></div>
   </div>
 
-<script>
-  // กรอกค่าจาก Firebase Console ของคุณ
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
+
   const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    // ... ใส่ค่าที่เหลือจาก Firebase Console
+    apiKey: "AIzaSyB0uJoVfeo8pgeTSBnpIS0_Wn0crK77tn8",
+    authDomain: "gasifanieprojectlogin.firebaseapp.com",
+    projectId: "gasifanieprojectlogin",
+    storageBucket: "gasifanieprojectlogin.firebasestorage.app",
+    messagingSenderId: "624483665613",
+    appId: "1:624483665613:web:e0bbde2d0d4d1ed8ad4b84",
+    measurementId: "G-C5L44TFZ1L"
   };
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
 
   const status = document.getElementById('status');
 
-  document.getElementById('signup-btn').addEventListener('click', () => {
-    const email = document.getElementById('signup-email').value;
-    const password = document.getElementById('signup-password').value;
+  document.getElementById('signup-btn').addEventListener('click', async () => {
+    const email = document.getElementById('signup-email').value.trim();
+    const password = document.getElementById('signup-password').value.trim();
     status.textContent = '';
-    auth.createUserWithEmailAndPassword(email, password)
-      .then(() => {
-        status.style.color = 'green';
-        status.textContent = 'สมัครสมาชิกสำเร็จ! กรุณาเข้าสู่ระบบ';
-      })
-      .catch(error => {
-        status.style.color = 'red';
-        status.textContent = 'ข้อผิดพลาด: ' + error.message;
-      });
+    try {
+      await createUserWithEmailAndPassword(auth, email, password);
+      status.style.color = 'green';
+      status.textContent = 'สมัครสมาชิกสำเร็จ! กรุณาเข้าสู่ระบบ';
+    } catch (error) {
+      status.style.color = 'red';
+      status.textContent = 'ข้อผิดพลาด: ' + error.message;
+    }
   });
 
-  document.getElementById('login-btn').addEventListener('click', () => {
-    const email = document.getElementById('login-email').value;
-    const password = document.getElementById('login-password').value;
+  document.getElementById('login-btn').addEventListener('click', async () => {
+    const email = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value.trim();
     status.textContent = '';
-    auth.signInWithEmailAndPassword(email, password)
-      .then(() => {
-        status.style.color = 'green';
-        status.textContent = 'เข้าสู่ระบบสำเร็จ กำลังไปยังหน้าเว็บหลัก...';
-        setTimeout(() => {
-          window.location.href = 'index.html';
-        }, 1000);
-      })
-      .catch(error => {
-        status.style.color = 'red';
-        status.textContent = 'ข้อผิดพลาด: ' + error.message;
-      });
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      status.style.color = 'green';
+      status.textContent = 'เข้าสู่ระบบสำเร็จ กำลังไปยังหน้าเว็บหลัก...';
+      setTimeout(() => {
+        window.location.href = 'index.html';
+      }, 1000);
+    } catch (error) {
+      status.style.color = 'red';
+      status.textContent = 'ข้อผิดพลาด: ' + error.message;
+    }
   });
 
-  // ถ้าผู้ใช้ล็อกอินอยู่แล้ว ให้ไปหน้า index.html เลย
-  auth.onAuthStateChanged(user => {
+  onAuthStateChanged(auth, user => {
     if(user){
       window.location.href = 'index.html';
     }
