@@ -589,6 +589,8 @@
       #hamburger-btn {
         display: block;
         /* Show hamburger button on mobile */
+        font-size: 26px;
+        padding: 10px 16px;
       }
 
       /* Image Overlay adjustments for mobile */
@@ -598,8 +600,8 @@
         height: auto;
         max-height: 90vh;
         /* Allow it to take more vertical space */
-        width: 90vw;
-        /* Take 90% of viewport width */
+        width: 96vw;
+        /* Take 96% of viewport width */
         overflow-y: auto;
         /* Allow scrolling if content overflows */
       }
@@ -620,14 +622,14 @@
       }
 
       #overlay-img {
-        max-height: 300px;
+        max-height: 220px;
         /* Limit image height to prevent excessive stretching */
         width: auto;
         /* Allow image to size itself */
       }
 
       #overlay-text {
-        padding: 10px 15px;
+        padding: 10px 10px;
         /* Adjust padding for mobile */
       }
 
@@ -646,6 +648,77 @@
       #add-image-btn {
         right: 65px;
         /* Shift add button left a bit */
+      }
+
+      /* Input Tab: mobile-friendly */
+      #input-tab {
+        width: 98vw;
+        left: 1vw;
+        padding: 10px 8px;
+        border-radius: 18px;
+        font-size: 15px;
+        bottom: 10px;
+        max-width: 100vw;
+      }
+
+      #task-text-input {
+        font-size: 15px;
+        padding: 8px 8px;
+        border-radius: 14px;
+      }
+
+      #add-task-btn {
+        padding: 10px 14px;
+        font-size: 15px;
+        border-radius: 14px;
+        margin-left: 8px;
+      }
+
+      /* Task List: 1 column on mobile */
+      ul#task-list {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      ul#task-list li {
+        padding: 14px;
+        font-size: 15px;
+      }
+
+      ul#task-list li input[type="text"] {
+        font-size: 16px;
+        padding: 7px 10px;
+        border-radius: 8px;
+      }
+
+      ul#task-list li textarea {
+        font-size: 14px;
+        padding: 7px 10px;
+        min-height: 44px;
+      }
+
+      ul#task-list li button {
+        padding: 6px 10px;
+        font-size: 14px;
+        border-radius: 10px;
+      }
+
+      /* Sidebar input and button */
+      #new-category input {
+        font-size: 13px;
+        padding: 7px 8px;
+        border-radius: 7px 0 0 7px;
+      }
+
+      #new-category button {
+        font-size: 13px;
+        padding: 7px 10px;
+        border-radius: 0 7px 7px 0;
+      }
+
+      #category-list li {
+        font-size: 15px;
+        padding: 9px 8px;
       }
     }
   </style>
