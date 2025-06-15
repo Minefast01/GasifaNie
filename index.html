@@ -31,6 +31,7 @@
       color: #ddd;
     }
 
+    /* Sidebar Styles (Default for Desktop) */
     #sidebar {
       width: 260px;
       background: var(--sidebar-bg-light);
@@ -41,12 +42,15 @@
       box-sizing: border-box;
       border-right: 1px solid var(--sidebar-border-light);
       position: fixed;
+      /* Keep it fixed on desktop too */
       top: 0;
       left: 0;
       height: 100vh;
       overflow-y: auto;
       transition: background 0.3s, color 0.3s, border-color 0.3s, left 0.3s ease-in-out;
+      /* Add left to transition */
       z-index: 100;
+      /* Ensure it's above main content on desktop */
     }
 
     body.dark-mode #sidebar {
@@ -150,9 +154,12 @@
       background: #005a9e;
     }
 
+    /* Content Wrapper Styles */
     #content-wrapper {
       margin-left: 260px;
+      /* Shift content by sidebar width on desktop */
       width: calc(100vw - 260px);
+      /* Content takes remaining width */
       flex-grow: 1;
       display: flex;
       flex-direction: column;
@@ -187,8 +194,10 @@
       background: #005a9e;
     }
 
+    /* Hamburger Button (Mobile Only) */
     #hamburger-btn {
       display: none;
+      /* Hidden by default on desktop */
       background: #0078d4;
       color: white;
       border: none;
@@ -198,9 +207,12 @@
       cursor: pointer;
       border-radius: 8px;
       margin-right: auto;
+      /* Push theme button to the right */
       z-index: 101;
+      /* Above input tab if sidebar open */
     }
 
+    /* Input Tab Styles */
     #input-tab {
       position: fixed;
       bottom: 20px;
@@ -218,6 +230,7 @@
       border: 2px solid transparent;
       font-size: 16px;
       z-index: 999;
+      /* Below sidebar if open */
       transition: background-color 0.3s;
     }
 
@@ -260,6 +273,7 @@
       background-color: #005a9e;
     }
 
+    /* Task List & Item Styles */
     ul#task-list {
       list-style: none;
       padding: 0;
@@ -370,6 +384,7 @@
       background: #005a9e;
     }
 
+    /* Image Overlay (Full View) Styles */
     #image-overlay {
       display: none;
       position: fixed;
@@ -381,10 +396,6 @@
       justify-content: center;
       align-items: center;
       z-index: 1100;
-    }
-
-    #image-overlay.visible {
-      display: flex;
     }
 
     #image-overlay>div {
@@ -480,148 +491,164 @@
     #overlay-text h3 {
       margin-top: 0;
       margin-bottom: 12px;
+      font-weight: 700;
+      font-size: 24px;
+      line-height: 1.2;
     }
 
     #overlay-text p {
-      margin: 0 0 12px 0;
-      white-space: pre-line;
-      word-break: break-word;
+      white-space: pre-wrap;
+      overflow-wrap: break-word;
+      flex-grow: 1;
+      font-size: 16px;
+      line-height: 1.4;
+      max-height: 100%;
+      overflow-y: auto;
     }
 
     #overlay-close {
       position: absolute;
       top: 10px;
-      right: 10px;
-      background: #eee;
-      color: #333;
-      border: none;
-      border-radius: 50%;
-      width: 32px;
-      height: 32px;
-      font-size: 22px;
+      right: 15px;
+      font-size: 28px;
+      font-weight: bold;
+      color: #999;
       cursor: pointer;
+      user-select: none;
+      transition: color 0.3s;
       z-index: 10;
-      transition: background 0.3s;
     }
 
     #overlay-close:hover {
-      background: #ff4d4f;
-      color: white;
+      color: #333;
     }
 
     body.dark-mode #overlay-close:hover {
-      background: #b02a37;
-      color: #fff;
+      color: #ddd;
     }
 
     input[type="file"] {
       display: none;
     }
 
+    /* กรณีไม่มีรูปภาพใน overlay ให้พื้นหลังสีขาว */
     #overlay-img.no-image {
-      background: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #888;
-      font-size: 18px;
-      height: 100%;
+      background-color: white;
       width: 100%;
+      height: 100%;
+      object-fit: contain;
     }
 
+    /* Sidebar overlay (mobile only) */
     #sidebar-overlay {
       display: none;
+      /* Hidden by default */
       position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: rgba(0, 0, 0, 0.3);
-      z-index: 99;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      /* Below sidebar, above content */
+      transition: opacity 0.3s ease-in-out;
     }
 
     #sidebar-overlay.visible {
       display: block;
+      opacity: 1;
     }
 
-    /* Minimal logout button style */
-    #logout-btn {
-      background: none;
-      border: none;
-      color: #0078d4;
-      font-size: 15px;
-      font-weight: 500;
-      padding: 6px 10px;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background 0.2s, color 0.2s;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    #logout-btn:hover {
-      background: #f0f4fa;
-      color: #005a9e;
-    }
-
-    /* Optional: icon style */
-    #logout-btn .logout-icon {
-      font-size: 17px;
-      margin-right: 2px;
-      vertical-align: middle;
-    }
-
+    /* Responsive for Mobile */
     @media (max-width: 600px) {
+
+      /* Sidebar adjustments for mobile */
       #sidebar {
         left: -260px;
-        transition: left 0.3s;
-        z-index: 200;
+        /* Hide sidebar off-screen */
+        z-index: 1001;
+        /* Ensure it's above everything when open */
       }
 
-      #sidebar.visible {
+      #sidebar.sidebar-open {
         left: 0;
+        /* Show sidebar */
       }
 
       #content-wrapper {
         margin-left: 0;
+        /* Content takes full width, no sidebar margin */
         width: 100vw;
-        padding: 12px 4vw;
+      }
+
+      #top-bar {
+        justify-content: space-between;
+        /* Hamburger to the left, theme button to the right */
       }
 
       #hamburger-btn {
         display: block;
+        /* Show hamburger button on mobile */
       }
 
-      #sidebar-overlay {
-        display: none;
+      /* Image Overlay adjustments for mobile */
+      #image-overlay>div {
+        flex-direction: column;
+        /* Stack image and text vertically */
+        height: auto;
+        max-height: 90vh;
+        /* Allow it to take more vertical space */
+        width: 90vw;
+        /* Take 90% of viewport width */
+        overflow-y: auto;
+        /* Allow scrolling if content overflows */
       }
 
-      #sidebar-overlay.visible {
-        display: block;
+      #overlay-img-container,
+      #overlay-text {
+        width: 100%;
+        /* Image and text containers take full width */
+        height: auto;
+        /* Height adjusts to content */
+      }
+
+      #overlay-img-container {
+        padding: 10px 0;
+        /* Add some vertical padding */
+        flex-shrink: 0;
+        /* Prevent shrinking too much */
+      }
+
+      #overlay-img {
+        max-height: 300px;
+        /* Limit image height to prevent excessive stretching */
+        width: auto;
+        /* Allow image to size itself */
+      }
+
+      #overlay-text {
+        padding: 10px 15px;
+        /* Adjust padding for mobile */
+      }
+
+      /* Adjust buttons in overlay for better touch target */
+      #add-image-btn,
+      #delete-image-btn {
+        bottom: 15px;
+        right: 15px;
+        /* Adjust right position for add button */
+        width: 44px;
+        /* Larger touch target */
+        height: 44px;
+        font-size: 28px;
+      }
+
+      #add-image-btn {
+        right: 65px;
+        /* Shift add button left a bit */
       }
     }
   </style>
-  <!-- เพิ่ม Firebase SDK ก่อน </head> -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-  <script>
-    function logout() {
-      localStorage.removeItem('userToken');
-      sessionStorage.removeItem('userSession');
-      // เรียก Firebase Auth signOut ด้วย (กรณีใช้ Firebase Auth)
-      if (window.firebase && firebase.auth) {
-        firebase.auth().signOut().then(function() {
-          window.location.href = 'login.html';
-        }).catch(function() {
-          window.location.href = 'login.html';
-        });
-      } else {
-        window.location.href = 'login.html';
-      }
-    }
-  </script>
 </head>
 
 <body>
@@ -629,19 +656,15 @@
     <h2>หมวดหมู่</h2>
     <ul id="category-list"></ul>
     <div id="new-category">
-      <input id="category-input" type="text" placeholder="เพิ่มหมวดหมู่..." autocomplete="off" />
-      <button id="add-category-btn">+</button>
+      <input type="text" id="category-input" placeholder="พิมพ์ชื่อหมวดหมู่..." />
+      <button id="add-category-btn">เพิ่ม</button>
     </div>
   </div>
 
   <div id="content-wrapper">
     <div id="top-bar">
-      <button id="hamburger-btn">&#9776;</button>
-      <button id="toggle-theme-btn">โหมดมืด</button>
-      <button id="logout-btn" onclick="logout()">
-        <span class="logout-icon">&#x1F6AA;</span> <!-- door emoji as icon -->
-        <span class="logout-text" style="font-size:15px;">ออกจากระบบ</span>
-      </button>
+      <button id="hamburger-btn">☰</button> <!-- Hamburger button for mobile -->
+      <button id="toggle-theme-btn" title="สลับโหมดมืด/สว่าง">โหมดมืด</button>
     </div>
     <ul id="task-list"></ul>
   </div>
@@ -652,45 +675,26 @@
   </div>
 
   <!-- Overlay แสดงงานเต็ม พร้อมเพิ่ม/ลบรูป -->
-  <div id="image-overlay">
+  <div id="image-overlay" onclick="if(event.target.id==='image-overlay') closeOverlay()">
     <div>
+      <div id="overlay-close" title="ปิด">×</div>
       <div id="overlay-img-container">
-        <img id="overlay-img" src="" alt="" />
-        <button id="add-image-btn" title="เพิ่มรูป">+</button>
-        <input type="file" id="add-image-input" accept="image/*" multiple />
-        <button id="delete-image-btn" title="ลบรูป">&#128465;</button>
+        <img id="overlay-img" alt="รูปงานเต็ม" />
+        <button id="add-image-btn" title="เพิ่มรูปภาพ">+</button>
+        <button id="delete-image-btn" title="ลบรูปภาพ">−</button>
+        <input type="file" id="add-image-input" accept="image/*" />
       </div>
       <div id="overlay-text">
         <h3 id="overlay-title"></h3>
         <p id="overlay-desc"></p>
       </div>
-      <button id="overlay-close" title="ปิด">&times;</button>
     </div>
   </div>
 
+  <!-- Overlay สำหรับซ่อนเนื้อหาเมื่อ Sidebar เปิด (Mobile Only) -->
   <div id="sidebar-overlay"></div>
 
   <script>
-    // Firebase config
-    const firebaseConfig = {
-      apiKey: "AIzaSyB0uJoVfeo8pgeTSBnpIS0_Wn0crK77tn8",
-      authDomain: "gasifanieprojectlogin.firebaseapp.com",
-      databaseURL: "https://gasifanieprojectlogin.firebaseio.com",
-      projectId: "gasifanieprojectlogin",
-      storageBucket: "gasifanieprojectlogin.appspot.com"
-    };
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-    const auth = firebase.auth();
-
-    // ตรวจสอบสถานะการล็อกอิน ถ้าไม่ได้ล็อกอิน redirect ไป login.html
-    auth.onAuthStateChanged(function(user) {
-      if (!user) {
-        window.location.href = "login.html";
-      }
-    });
-
     let categories = [];
     let tasks = [];
     let currentCategory = null;
@@ -706,9 +710,8 @@
     const addCategoryBtn = document.getElementById('add-category-btn');
     const categoryInput = document.getElementById('category-input');
     const categoryList = document.getElementById('category-list');
-    const hamburgerBtn = document.getElementById('hamburger-btn');
-    const sidebarOverlay = document.getElementById('sidebar-overlay');
-    const logoutBtn = document.getElementById('logout-btn');
+    const hamburgerBtn = document.getElementById('hamburger-btn'); // New
+    const sidebarOverlay = document.getElementById('sidebar-overlay'); // New
 
     const imageOverlay = document.getElementById('image-overlay');
     const overlayImgContainer = document.getElementById('overlay-img-container');
@@ -721,24 +724,20 @@
     const addImageInput = document.getElementById('add-image-input');
 
     function loadData() {
-      // โหลด categories จาก Firebase
-      db.ref('categories').once('value').then(snapshot => {
-        categories = snapshot.val() || [];
-        renderCategories();
-      });
+      const savedCategories = localStorage.getItem('categories');
+      const savedTasks = localStorage.getItem('tasks');
+      const savedCurrentCategory = localStorage.getItem('currentCategory');
 
-      // โหลด tasks จาก Firebase
-      db.ref('tasks').once('value').then(snapshot => {
-        tasks = snapshot.val() || [];
-        renderTasks();
-      });
+      categories = savedCategories ? JSON.parse(savedCategories) : ['ทั่วไป'];
+      tasks = savedTasks ? JSON.parse(savedTasks) : [];
+      currentCategory = savedCurrentCategory && categories.includes(savedCurrentCategory)
+        ? savedCurrentCategory
+        : categories[0];
     }
-
-    function saveCategories() {
-      db.ref('categories').set(categories);
-    }
-    function saveTasks() {
-      db.ref('tasks').set(tasks);
+    function saveData() {
+      localStorage.setItem('categories', JSON.stringify(categories));
+      localStorage.setItem('tasks', JSON.stringify(tasks));
+      localStorage.setItem('currentCategory', currentCategory);
     }
 
     function renderCategories() {
@@ -749,25 +748,27 @@
         if (cat === currentCategory) li.classList.add('active');
         li.onclick = () => {
           currentCategory = cat;
+          saveData();
           renderCategories();
           renderTasks();
+          // Close sidebar on mobile after selecting category
+          if (window.innerWidth <= 600) {
+            toggleSidebar();
+          }
         };
         const delBtn = document.createElement('button');
+        delBtn.textContent = '×';
         delBtn.className = 'delete-cat-btn';
-        delBtn.innerHTML = '&times;';
+        delBtn.title = 'ลบหมวดหมู่';
         delBtn.onclick = e => {
           e.stopPropagation();
-          if (categories.length === 1) {
-            alert('ต้องมีหมวดหมู่ อย่างน้อย 1 หมวดหมู่');
-            return;
-          }
           if (confirm(`ลบหมวดหมู่ "${cat}" ใช่หรือไม่?`)) {
             categories = categories.filter(c => c !== cat);
             tasks = tasks.filter(t => t.category !== cat);
             if (currentCategory === cat) {
               currentCategory = categories.length ? categories[0] : null;
             }
-            saveCategories();
+            saveData();
             renderCategories();
             renderTasks();
           }
@@ -780,16 +781,14 @@
     function renderTasks() {
       taskList.innerHTML = '';
       if (!currentCategory) return;
-      const filteredTasks = tasks.filter(t => t.category === currentCategory);
-      filteredTasks.forEach((task, idx) => {
+      tasks.filter(t => t.category === currentCategory).forEach((task, index) => {
         const li = document.createElement('li');
-        const globalIndex = tasks.findIndex(t => t === task);
 
         if (task.images && task.images.length > 0) {
           const img = document.createElement('img');
           img.src = task.images[0];
           img.alt = 'รูปงาน';
-          img.onclick = () => showImageOverlay(globalIndex);
+          img.onclick = () => showImageOverlay(index);
           li.appendChild(img);
         }
 
@@ -797,8 +796,8 @@
         titleInput.type = 'text';
         titleInput.value = task.text || '';
         titleInput.addEventListener('change', e => {
-          tasks[globalIndex].text = e.target.value.trim();
-          saveTasks();
+          tasks[index].text = e.target.value.trim();
+          saveData();
         });
         li.appendChild(titleInput);
 
@@ -807,8 +806,8 @@
         descTextarea.value = task.description;
         descTextarea.placeholder = 'พิมพ์ข้อความย่อย...';
         descTextarea.addEventListener('change', e => {
-          tasks[globalIndex].description = e.target.value;
-          saveTasks();
+          tasks[index].description = e.target.value;
+          saveData();
         });
         descTextarea.addEventListener('input', e => {
           autoResizeTextarea(e.target);
@@ -820,15 +819,15 @@
         viewBtn.textContent = 'ดูงานเต็ม';
         viewBtn.className = 'view-btn';
         viewBtn.title = 'ดูงานเต็ม';
-        viewBtn.onclick = () => showImageOverlay(globalIndex);
+        viewBtn.onclick = () => showImageOverlay(index);
         li.appendChild(viewBtn);
 
         const delBtn = document.createElement('button');
         delBtn.textContent = 'ลบ';
         delBtn.className = 'delete-btn';
         delBtn.onclick = () => {
-          tasks.splice(globalIndex, 1);
-          saveTasks();
+          tasks.splice(index, 1);
+          saveData();
           renderTasks();
         };
         li.appendChild(delBtn);
@@ -839,19 +838,20 @@
 
     function autoResizeTextarea(textarea) {
       textarea.style.height = 'auto';
-      textarea.style.height = (textarea.scrollHeight) + 'px';
+      textarea.style.height = textarea.scrollHeight + 'px';
     }
 
     function addTask(text, image = null) {
-      text = (text || '').trim();
-      if (!text) return;
-      tasks.push({
-        text,
-        description: '',
-        images: image ? [image] : [],
-        category: currentCategory
-      });
-      saveTasks();
+      if (!text.trim()) {
+        alert('กรุณาพิมพ์ข้อความงานก่อนเพิ่ม');
+        return;
+      }
+      if (!currentCategory) {
+        alert('กรุณาเลือกหมวดหมู่ก่อนเพิ่มงาน');
+        return;
+      }
+      tasks.push({ text: text.trim(), description: '', images: image ? [image] : [], category: currentCategory });
+      saveData();
       renderTasks();
       taskTextInput.value = '';
     }
@@ -862,94 +862,147 @@
 
     taskTextInput.addEventListener('keypress', e => {
       if (e.key === 'Enter') {
-        addTaskBtn.click();
+        addTask(taskTextInput.value);
       }
     });
 
     addCategoryBtn.addEventListener('click', () => {
-      const cat = categoryInput.value.trim();
-      if (!cat) return;
-      if (categories.includes(cat)) {
-        alert('มีหมวดหมู่นี้แล้ว');
+      const newCat = categoryInput.value.trim();
+      if (!newCat) {
+        alert('กรุณาพิมพ์ชื่อหมวดหมู่');
         return;
       }
-      categories.push(cat);
-      currentCategory = cat;
-      saveCategories();
+      if (categories.includes(newCat)) {
+        alert('หมวดหมู่นี้มีอยู่แล้ว');
+        return;
+      }
+      categories.push(newCat);
+      currentCategory = newCat;
+      categoryInput.value = '';
+      saveData();
       renderCategories();
       renderTasks();
-      categoryInput.value = '';
     });
 
-    categoryInput.addEventListener('keypress', e => {
-      if (e.key === 'Enter') {
-        addCategoryBtn.click();
-      }
-    });
-
-    function setThemeFromStorage() {
-      const theme = localStorage.getItem('theme');
-      if (theme === 'dark') {
-        document.body.classList.add('dark-mode');
-        toggleThemeBtn.textContent = 'โหมดสว่าง';
-      } else {
-        document.body.classList.remove('dark-mode');
-        toggleThemeBtn.textContent = 'โหมดมืด';
-      }
-    }
     toggleThemeBtn.addEventListener('click', () => {
       document.body.classList.toggle('dark-mode');
-      const isDark = document.body.classList.contains('dark-mode');
-      toggleThemeBtn.textContent = isDark ? 'โหมดสว่าง' : 'โหมดมืด';
-      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      toggleThemeBtn.textContent = document.body.classList.contains('dark-mode') ? 'โหมดสว่าง' : 'โหมดมืด';
     });
-    setThemeFromStorage();
 
-    // Drag & drop image to input-tab
     const inputTab = document.getElementById('input-tab');
     inputTab.addEventListener('dragover', e => {
       e.preventDefault();
       inputTab.classList.add('dragover');
     });
     inputTab.addEventListener('dragleave', e => {
+      e.preventDefault();
       inputTab.classList.remove('dragover');
     });
     inputTab.addEventListener('drop', e => {
       e.preventDefault();
       inputTab.classList.remove('dragover');
-      const file = e.dataTransfer.files[0];
-      if (file && file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = evt => {
-          addTask(taskTextInput.value, evt.target.result);
-        };
-        reader.readAsDataURL(file);
+
+      const files = e.dataTransfer.files;
+      if (files.length === 0) return;
+
+      const file = files[0];
+      if (!file.type.startsWith('image/')) {
+        alert('กรุณาลากเฉพาะไฟล์รูปภาพ');
+        return;
       }
+
+      const text = taskTextInput.value.trim();
+      if (!text) {
+        alert('กรุณาพิมพ์ข้อความงานก่อนลากรูปภาพ');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function (event) {
+        addTask(text, event.target.result);
+      };
+      reader.readAsDataURL(file);
     });
 
     function showImageOverlay(taskIndex) {
+      const task = tasks[taskIndex];
       currentViewingTaskIndex = taskIndex;
       currentViewingImageIndex = 0;
-      renderOverlayImages(tasks[taskIndex].images);
-      overlayTitle.textContent = tasks[taskIndex].text;
-      overlayDesc.textContent = tasks[taskIndex].description || '';
-      imageOverlay.classList.add('visible');
+      overlayTitle.textContent = task.text || '';
+      overlayDesc.textContent = task.description || '';
+      renderOverlayImages(task.images);
+      imageOverlay.style.display = 'flex';
     }
 
     function renderOverlayImages(images) {
-      if (!images || images.length === 0) {
-        overlayImg.src = '';
-        overlayImg.style.display = 'none';
-        overlayImgContainer.classList.add('no-image');
+      overlayImgContainer.innerHTML = ''; // Clear previous content
+
+      // Create the main image element
+      const mainImgElement = document.createElement('img');
+      mainImgElement.id = 'overlay-img';
+      mainImgElement.alt = 'รูปงานเต็ม';
+
+      if (images && images.length > 0) {
+        mainImgElement.src = images[currentViewingImageIndex];
+        mainImgElement.classList.remove('no-image'); // Remove no-image class
       } else {
-        overlayImg.src = images[currentViewingImageIndex];
-        overlayImg.style.display = '';
-        overlayImgContainer.classList.remove('no-image');
+        mainImgElement.src = ''; // No image source
+        mainImgElement.classList.add('no-image'); // Add no-image class for white background
+      }
+      overlayImgContainer.appendChild(mainImgElement);
+
+      // Append buttons
+      overlayImgContainer.appendChild(addImageBtn);
+      overlayImgContainer.appendChild(deleteImageBtn);
+      overlayImgContainer.appendChild(addImageInput); // Keep input field here for functionality
+
+      // Render thumbnails if multiple images exist
+      if (images && images.length > 1) {
+        const thumbContainer = document.createElement('div');
+        thumbContainer.style.position = 'absolute';
+        thumbContainer.style.bottom = '10px';
+        thumbContainer.style.left = '10px';
+        thumbContainer.style.right = '10px';
+        thumbContainer.style.display = 'flex';
+        thumbContainer.style.gap = '8px';
+        thumbContainer.style.justifyContent = 'center';
+        thumbContainer.style.zIndex = '6'; /* Above other elements except close button */
+        overlayImgContainer.appendChild(thumbContainer);
+
+        images.forEach((src, i) => {
+          const thumb = document.createElement('img');
+          thumb.src = src;
+          thumb.style.width = '50px';
+          thumb.style.height = '50px';
+          thumb.style.objectFit = 'cover';
+          thumb.style.borderRadius = '6px';
+          thumb.style.cursor = 'pointer';
+          thumb.style.border = i === currentViewingImageIndex ? '2px solid #0078d4' : '2px solid transparent';
+          thumb.title = `รูปที่ ${i + 1}`;
+          thumb.onclick = () => {
+            currentViewingImageIndex = i;
+            mainImgElement.src = src;
+            Array.from(thumbContainer.children).forEach(c => c.style.border = '2px solid transparent');
+            thumb.style.border = '2px solid #0078d4';
+          };
+          thumbContainer.appendChild(thumb);
+        });
       }
     }
 
     function closeOverlay() {
-      imageOverlay.classList.remove('visible');
+      imageOverlay.style.display = 'none';
+      // Clear dynamic content from container
+      overlayImgContainer.innerHTML = '';
+      // Re-append buttons and input for next use
+      overlayImgContainer.appendChild(overlayImg); // Re-add the main image element
+      overlayImgContainer.appendChild(addImageBtn);
+      overlayImgContainer.appendChild(deleteImageBtn);
+      overlayImgContainer.appendChild(addImageInput);
+
+
+      overlayTitle.textContent = '';
+      overlayDesc.textContent = '';
       currentViewingTaskIndex = null;
       currentViewingImageIndex = 0;
     }
@@ -957,7 +1010,9 @@
     overlayClose.addEventListener('click', closeOverlay);
 
     imageOverlay.addEventListener('click', e => {
-      if (e.target === imageOverlay) closeOverlay();
+      if (e.target === imageOverlay) {
+        closeOverlay();
+      }
     });
 
     addImageBtn.addEventListener('click', () => {
@@ -965,69 +1020,72 @@
     });
 
     addImageInput.addEventListener('change', e => {
-      const files = Array.from(e.target.files);
-      if (!files.length) return;
-      const task = tasks[currentViewingTaskIndex];
-      let loaded = 0;
-      files.forEach(file => {
-        if (file.type.startsWith('image/')) {
-          const reader = new FileReader();
-          reader.onload = evt => {
-            task.images = task.images || [];
-            task.images.push(evt.target.result);
-            loaded++;
-            if (loaded === files.length) {
-              saveTasks();
-              renderOverlayImages(task.images);
-              renderTasks();
-            }
-          };
-          reader.readAsDataURL(file);
+      const file = e.target.files[0];
+      if (!file) return;
+      if (!file.type.startsWith('image/')) {
+        alert('กรุณาเลือกไฟล์รูปภาพเท่านั้น');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = function (event) {
+        if (currentViewingTaskIndex !== null) {
+          if (!tasks[currentViewingTaskIndex].images) {
+            tasks[currentViewingTaskIndex].images = [];
+          }
+          tasks[currentViewingTaskIndex].images.push(event.target.result);
+          saveData();
+          renderTasks(); // Re-render task list to show updated thumbnail if applicable
+          showImageOverlay(currentViewingTaskIndex); // Re-open overlay to show new image
         }
-      });
+      };
+      reader.readAsDataURL(file);
       addImageInput.value = '';
     });
 
     deleteImageBtn.addEventListener('click', () => {
+      if (currentViewingTaskIndex === null) return;
       const task = tasks[currentViewingTaskIndex];
-      if (!task.images || task.images.length === 0) return;
-      if (!confirm('ลบรูปนี้ใช่หรือไม่?')) return;
-      task.images.splice(currentViewingImageIndex, 1);
-      if (currentViewingImageIndex > 0) currentViewingImageIndex--;
-      saveTasks();
-      renderOverlayImages(task.images);
-      renderTasks();
+      if (!task.images || task.images.length === 0) {
+        alert('ไม่มีรูปภาพให้ลบ');
+        return;
+      }
+
+      if (confirm('ยืนยันที่จะลบรูปภาพนี้ใช่หรือไม่?')) {
+        task.images.splice(currentViewingImageIndex, 1);
+
+        if (task.images.length === 0) {
+          // If no images left, ensure images array is empty and close overlay
+          task.images = [];
+          saveData();
+          renderTasks();
+          closeOverlay();
+          return;
+        }
+
+        // Adjust index if the last image was deleted
+        if (currentViewingImageIndex >= task.images.length) {
+          currentViewingImageIndex = task.images.length - 1;
+        }
+
+        saveData();
+        renderTasks(); // Re-render task list to update thumbnail if needed
+        showImageOverlay(currentViewingTaskIndex); // Re-open overlay to show updated images
+      }
     });
 
     // Sidebar toggle functionality
     function toggleSidebar() {
-      sidebar.classList.toggle('visible');
+      sidebar.classList.toggle('sidebar-open');
       sidebarOverlay.classList.toggle('visible');
     }
 
-    hamburฟgerBtn.addEventListener('click', toggleSidebar);
-    sidebarOverlay.addEventListener('click', toggleSidebar);
-
-    if (logoutBtn) {
-      logoutBtn.addEventListener('click', function() {
-        // ใช้ Firebase Auth จริง
-        if (firebase && firebase.auth) {
-          firebase.auth().signOut().then(() => {
-            // ออกจากระบบเสร็จ redirect ไป login.html
-            window.location.href = "login.html";
-          }).catch((error) => {
-            alert('เกิดข้อผิดพลาด: ' + error.message);
-          });
-        } else {
-          // fallback
-          window.location.href = "login.html";
-        }
-      });
-    }
+    hamburgerBtn.addEventListener('click', toggleSidebar);
+    sidebarOverlay.addEventListener('click', toggleSidebar); // Close sidebar when clicking outside
 
     loadData();
     renderCategories();
     renderTasks();
+    toggleThemeBtn.textContent = 'โหมดมืด';
   </script>
 </body>
 
